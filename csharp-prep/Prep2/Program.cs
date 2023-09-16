@@ -10,22 +10,11 @@ class Program
 
         string letter = "";
 
-        string gradeSign = "";
     
 
         if (gradePercentage >= 90)
         {
             letter = "A";
-
-            if (gradePercentage >= 95)
-            {
-                gradeSign = "+";
-            }
-
-            else
-            {
-                gradeSign = "-";
-            }
 
         }
 
@@ -33,30 +22,12 @@ class Program
         {
             letter = "B";
 
-            if (gradePercentage >= 85)
-            {
-                gradeSign = "+";
-            }
-
-            else
-            {
-                gradeSign = "-";
-            }
         }
 
         else if (gradePercentage >= 70)
         {
             letter = "C";
 
-            if (gradePercentage >= 75)
-            {
-                gradeSign = "+";
-            }
-
-            else
-            {
-                gradeSign = "-";
-            }
         }
 
         else if (gradePercentage >= 60)
