@@ -1,166 +1,96 @@
 using System;
+using System.Text.Json;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static System.Console;
-using System.IO;
-
-namespace Develop02
+ public class Journal
 {
-    class Journal
+    // variables
+    public List<JournalCapture> _journal = new List<JournalCapture>();
+    private string _userFile;
+     // Display journal capture
+    public void Display()
     {
-        private string JournalFile = "MyJournal.txt";
-        private string TitleArt = @"(\
-(\ 
-\'\ 
- \'\     __________  
- / '|   ()_________)
- \ '/    \ ~~~~~~~~ \
-   \       \ ~~~~~~   \
-   ==).      \__________\
-  (__)       ()__________)";
-
-        public void Run()
+        Console.WriteLine("\n******* Journal Capture ******");
+        foreach (JournalCapture journalCapture in _journal)
         {
-            Title = "Journal ";
-                DisplayIntro();
-                CreateJournalFile();
-                RunMenu();
-                     
-                DisplayOutro();
+            journalCapture.Display();
         }
-
-        private void RunMenu()
+    }
+     public void CreateJournalFile()
+    {
+        Console.Write("Please name your file: ");
+        string userInput = Console.ReadLine();
+        _userFile = userInput + ".txt";
+         if (!File.Exists(_userFile))
         {
-            string choice;
-            do
-            {
-                choice = GetChoice();
-                switch (choice)
-                {
-                    case "1":
-                        DisplayJournalContents();
-                        break;
-                    case "2":
-                        ClearFile();
-                        break;
-                    case "3":
-                        AddEntry();
-                        break;
-                    default:
-                        break;
-                }
-            } while (choice != "4");
-            
-            
+            File.CreateText(_userFile);
+            Console.Write($"\n** {_userFile} successfully created! **\n");
+            Console.Write("**  The journal has been saved. **\n");
+            WriteToFile(_userFile, false);
+            CreateJSON(userInput);
         }
-
-        private string GetChoice()
+        else
         {
-            bool isChoiceVlid = false;
-            string choice = "";
-
-            do
-            {
-                Clear();
-                ForegroundColor = ConsoleColor.DarkGray;
-                WriteLine(TitleArt);
-                ForegroundColor = ConsoleColor.Black;
-                WriteLine("\nWhat would you like to do? ");
-                WriteLine(" > 1 - Read the journal.");
-                WriteLine(" > 2 - Clear the journal.");
-                WriteLine(" > 3 - Add t the journal.");
-                WriteLine(" > 4 -  Exit.");
-
-                ForegroundColor = ConsoleColor.DarkCyan;
-                choice = ReadLine().Trim();
-                ForegroundColor = ConsoleColor.Black;
-
-                if (choice == "1" || choice == "2" || choice == "3" || choice == "4")
-                {
-                    isChoiceVlid = true;
-                }
-
-                else
-                {
-                    ForegroundColor = ConsoleColor.DarkRed;
-                    WriteLine($"\"{choice}\" is not a valid option. Please choose 1-4");
-                    WaitForKey();
-                }
-
-            } while(!isChoiceVlid);
-
-            
-            return choice;
+            Console.Write($"\n*** {_userFile} exits. ***\n");
+            Console.Write("***  The journal capture has been added. ***\n");
+            WriteToFile(_userFile, true);
         }
-
-        private void CreateJournalFile()
+    }
+     public void WriteToFile(string _userFile, bool append)
+    {
+        using (StreamWriter outputFile = new StreamWriter(_userFile, append))
+        {
+            foreach (JournalCapture journalCapture in _journal)
             {
-               WriteLine($"Does file exist? {File.Exists("MyJournal.txt")}");
-               if (File.Exists("MyJournal.txt"))
-               {
-                File.CreateText("MyJournal.txt");
-               }
-
+                outputFile.WriteLine($"{journalCapture._captureNo}; {journalCapture._dateTime}; {journalCapture._Questions}; {journalCapture._journalCapture}");
             }
-
-        private void DisplayIntro() 
-        {
-            ForegroundColor = ConsoleColor.Black;
-            BackgroundColor = ConsoleColor.White;
-            Clear();
-            WriteLine(TitleArt);
-            WriteLine ("\nWelcome to the only journal");
-            WaitForKey();
         }
-
-        private void DisplayOutro() 
+    }
+     public void LoadJournalFile()
+    {
+        Console.Write("Please enter your file name: ");
+        string userInput = Console.ReadLine();
+        _userFile = userInput + ".txt";
+         if (File.Exists(_userFile))
         {
-            WriteLine("\nArt from: https://www.asciiart.eu/books/books");
-            WriteLine ("\nThank you for adding an Entry");
-            WaitForKey();
+            using (StreamReader sr = new StreamReader(_userFile))
+            {
+                string line;
+                while ((line = sr.ReadLine()) != null)
+                {
+                    if (string.IsNullOrWhiteSpace(line)) continue;
+                     string[] captured = line.Split("; ");
+                     JournalCapture capture = new JournalCapture();
+                     capture._captureNo = captured[0];
+                    capture._dateTime = captured[1];
+                    capture._Questions = captured[2];
+                    capture._journalCapture = captured[3];
+                     _journal.Add(capture);
+                }
+            }
         }
-
-        private void WaitForKey()
+    }
+     public void CreateJSON(string userInput)
+    {
+        string fileName = userInput + ".json";
+        List<JsonFile> _data = new List<JsonFile>();
+         foreach (JournalCapture journalCapture in _journal)
         {
-            ForegroundColor = ConsoleColor.DarkGray;
-            WriteLine("\nPress any key...");
-            ReadKey(true);
+            _data.Add(new JsonFile()
+            {
+                ID = journalCapture._captureNo,
+                Date = journalCapture._dateTime,
+                Prompt = journalCapture._Questions,
+                Capture = journalCapture._journalCapture
+            });
         }
+         string json = JsonSerializer.Serialize(_data);
+        File.WriteAllText(fileName, json);
+    }
 
-        private void DisplayJournalContents() 
-        {
-            string journalText = File.ReadAllText(JournalFile);
-            WriteLine("\n*** Journal ***");
-            WriteLine(journalText);
-            WriteLine("*******************************************************");
-            WaitForKey();
-        }
-
-        private void ClearFile() 
-        {
-            ForegroundColor = ConsoleColor.Black;
-            File.WriteAllText(JournalFile, "");
-            WriteLine("\nJournal Cleared!");
-            WaitForKey();
-        }
-
-        private void AddEntry() 
-        {
-            ForegroundColor = ConsoleColor.Black;
-            
-            Wordprompt myQuestion = new Wordprompt();
-            myQuestion.Run();
-            //WriteLine(myQuestion);
-            //WriteLine("\nWhat would you like to add: ");
-            ForegroundColor = ConsoleColor.DarkBlue;
-            string newLine = ReadLine();
-            File.AppendAllText(JournalFile, $"\nEntry:\n> {newLine}\n");
-            ForegroundColor = ConsoleColor.Black;
-            WriteLine( "The journal has been modified!");
-            WaitForKey();
-        }
-        
+    internal void SaveJournalFile()
+    {
+        throw new NotImplementedException();
     }
 }
