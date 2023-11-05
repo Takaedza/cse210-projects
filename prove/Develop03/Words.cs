@@ -12,7 +12,7 @@ class Word
 
     public string GetDisplayText()
     {
-        if(this.hidden)
+        if (this.hidden)
         {
             return "_________";
         }

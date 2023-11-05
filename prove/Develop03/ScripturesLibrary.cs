@@ -1,11 +1,11 @@
 class ScriptureLibrary
 {
     private List<Scripture> scriptures;
-     public ScriptureLibrary()
+    public ScriptureLibrary()
     {
         this.scriptures = new List<Scripture>();
     }
-     public void LoadFromFile(string filename)
+    public void LoadFromFile(string filename)
     {
         StreamReader reader = new StreamReader(filename);
         while (!reader.EndOfStream)
@@ -16,7 +16,7 @@ class ScriptureLibrary
         }
         reader.Close();
     }
-     public Scripture GetRandomScripture()
+    public Scripture GetRandomScripture()
     {
         Random random = new Random();
         return this.scriptures[random.Next(this.scriptures.Count)];

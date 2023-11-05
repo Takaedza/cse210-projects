@@ -2,7 +2,7 @@ class Scripture
 {
     private Reference reference;
     private List<Word> words;
-     public Scripture(string reference, string text)
+    public Scripture(string reference, string text)
     {
         this.reference = new Reference(reference);
         this.words = new List<Word>();
@@ -12,7 +12,7 @@ class Scripture
             this.words.Add(new Word(wordString));
         }
     }
-     public string GetFullText()
+    public string GetFullText()
     {
         string fullText = this.reference.ToString() + " ";
         foreach (Word word in this.words)
@@ -21,7 +21,7 @@ class Scripture
         }
         return fullText.Trim();
     }
-     public void HideRandomWords()
+    public void HideRandomWords()
     {
         Random random = new Random();
         foreach (Word word in this.words)
@@ -32,7 +32,7 @@ class Scripture
             }
         }
     }
-     public bool AllWordsHidden()
+    public bool AllWordsHidden()
     {
         foreach (Word word in this.words)
         {
